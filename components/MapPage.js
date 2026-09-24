@@ -152,14 +152,21 @@ export default function MapPage() {
     if (!c) return;
 
     try {
-      // Goes through our own route handler (app/api/nearbybus/route.js)
-      // instead of calling chalo.com from the browser.
-      const { data } = await axios.post('/api/nearbybus', {
-        lat: c.lat().toFixed(6),
-        lng: c.lng().toFixed(6),
-        radius: 1000,
-      });
-
+      const { data } = await axios.post(
+        'https://chalo.com/app/api/nearbybus/v2/city/PALAKKAD',
+        {
+          metaData: { source: 'web' },
+          requiredFields: {
+            nearbyBuses: {
+              lat: c.lat().toFixed(6),
+              lng: c.lng().toFixed(6),
+              radius: 1000,
+            },
+            cardsInfo: {},
+          },
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       const nextBuses = data.buses ?? [];
       setBuses(nextBuses);
       if (nextBuses.length === 0) {
