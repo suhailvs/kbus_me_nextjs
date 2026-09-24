@@ -1,8 +1,11 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import Script from 'next/script';
 import SiteLayout from '../components/SiteLayout';
 import { CITIES, saveCity } from '../lib/cities';
 import styles from '../styles/Landing.module.css';
+
+const GA_ID = 'G-JN13EH64RK';
 
 // One static page per city: /wayanad, /kozhikode, ...
 export function getStaticPaths() {
@@ -96,6 +99,13 @@ export default function CityPage({ city }) {
 
   return (
     <SiteLayout>
+      <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+      <Script id="gtag-init" strategy="afterInteractive">
+        {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_ID}');`}
+      </Script>
       <Head>
         <title>{`Live Bus Tracking in ${label} | KSRTC ${label} Buses – kbus.me`}</title>
         <meta
