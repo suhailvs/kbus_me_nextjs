@@ -1,39 +1,11 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import Script from 'next/script';
-import { Space_Grotesk, IBM_Plex_Sans } from 'next/font/google';
+import SiteLayout from '../components/SiteLayout';
+import { DISTRICTS, saveDistrict } from '../lib/districts';
 import styles from '../styles/Landing.module.css';
 
-const display = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-display',
-});
-const body = IBM_Plex_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-body',
-});
-
 const GA_ID = 'G-JN13EH64RK';
-
-// Same slugs as DISTRICT_CENTERS in MapPage.js (case matters: "Pathanamthitta").
-const DISTRICTS = [
-  { slug: 'thiruvananthapuram', label: 'Thiruvananthapuram' },
-  { slug: 'kollam', label: 'Kollam' },
-  { slug: 'Pathanamthitta', label: 'Pathanamthitta' },
-  { slug: 'kottayam', label: 'Kottayam' },
-  { slug: 'alappuzha', label: 'Alappuzha' },
-  { slug: 'idukki', label: 'Idukki' },
-  { slug: 'ernakulam', label: 'Ernakulam' },
-  { slug: 'thrissur', label: 'Thrissur' },
-  { slug: 'palakkad', label: 'Palakkad' },
-  { slug: 'malappuram', label: 'Malappuram' },
-  { slug: 'kozhikode', label: 'Kozhikode' },
-  { slug: 'wayanad', label: 'Wayanad' },
-  { slug: 'kannur', label: 'Kannur' },
-  { slug: 'kasaragod', label: 'Kasaragod' },
-];
 
 const CORRIDOR = [
   { x: 20, name: 'Kannur' },
@@ -133,14 +105,6 @@ const REDIRECT_SCRIPT = `(function () {
   } catch (e) {}
 })();`;
 
-function saveDistrict(slug) {
-  try {
-    localStorage.setItem('selectedDistrict', JSON.stringify({ slug }));
-  } catch {
-    // localStorage unavailable — navigation still proceeds
-  }
-}
-
 export default function Home() {
   return (
     <>
@@ -163,28 +127,16 @@ export default function Home() {
         />
       </Head>
 
-      {/* Google tag (gtag.js) */}
+      {/* Google tag (gtag.js) 
       <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
       <Script id="gtag-init" strategy="afterInteractive">
         {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
-      </Script>
+      </Script>*/}
 
-      <div className={`${styles.page} ${display.variable} ${body.variable}`}>
-        <header className={styles.siteHeader}>
-          <Link className={styles.logo} href="/">
-            kbus<span>.me</span>
-          </Link>
-          <nav>
-            <a className={styles.navLink} href="#how-it-works">How it works</a>
-            <a className={styles.navLink} href="#coverage">Coverage</a>
-            <Link className={styles.btnPrimary} href="/map">Open live map</Link>
-          </nav>
-        </header>
-
-        <main>
+      <SiteLayout>
           {/* Hero */}
           <section className={styles.hero}>
             <div className={`${styles.heroInner} ${styles.wrap}`}>
@@ -302,20 +254,7 @@ gtag('config', '${GA_ID}');`}
               <Link className={styles.btnPrimary} href="/map">Open live map</Link>
             </div>
           </section>
-        </main>
-
-        <footer className={styles.footer}>
-          <div className={styles.footerInner}>
-            <p>
-              kbus.me is an independent live bus tracking service for Kerala KSRTC routes. It is not
-              officially affiliated with, or endorsed by, Kerala State Road Transport Corporation.
-            </p>
-            <div className={styles.footerLinks}>
-              <Link href="/map">Live map</Link>
-            </div>
-          </div>
-        </footer>
-      </div>
+      </SiteLayout>
     </>
   );
 }
