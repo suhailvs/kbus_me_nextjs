@@ -6,7 +6,7 @@
   height: 100dvh;
 }
 
-.district-picker {
+.city-picker {
   align-items: center;
   background: #e8edf0;
   display: flex;
@@ -16,7 +16,7 @@
   padding: 24px;
 }
 
-.district-picker__card {
+.city-picker__card {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -25,12 +25,12 @@
   width: 100%;
 }
 
-.district-picker__card h1 {
+.city-picker__card h1 {
   font-size: 1.75rem;
   margin: 0 0 8px;
 }
 
-.district-picker__card p {
+.city-picker__card p {
   color: #5f6368;
   margin: 0 0 24px;
 }
@@ -77,7 +77,7 @@
   max-width: calc(100% - 32px);
 }
 
-#district-select {
+#city-select {
   position: absolute;
   top: 16px;
   left: 16px;

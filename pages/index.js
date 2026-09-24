@@ -1,8 +1,9 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import Script from 'next/script';
+import Image from 'next/image';
 import SiteLayout from '../components/SiteLayout';
-import { DISTRICTS, saveDistrict } from '../lib/districts';
+import { CITIES, saveCity } from '../lib/cities';
 import styles from '../styles/Landing.module.css';
 
 const GA_ID = 'G-JN13EH64RK';
@@ -99,7 +100,7 @@ const JSON_LD = {
 // /map without ever seeing this page.
 const REDIRECT_SCRIPT = `(function () {
   try {
-    if (localStorage.getItem('selectedDistrict')) {
+    if (localStorage.getItem('selectedCity')) {
       window.location.replace('/map');
     }
   } catch (e) {}
@@ -127,14 +128,14 @@ export default function Home() {
         />
       </Head>
 
-      {/* Google tag (gtag.js) 
+      {/* Google tag (gtag.js) */}
       <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
       <Script id="gtag-init" strategy="afterInteractive">
         {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
-      </Script>*/}
+      </Script>
 
       <SiteLayout>
           {/* Hero */}
@@ -187,7 +188,7 @@ gtag('config', '${GA_ID}');`}
           {/* Stats */}
           <div className={styles.stats}>
             <div className={styles.statsInner}>
-              <div className={styles.stat}><b>14</b><span>districts covered</span></div>
+              <div className={styles.stat}><b>14</b><span>cities covered</span></div>
               <div className={styles.stat}><b>30s</b><span>position refresh</span></div>
               <div className={styles.stat}><b>1000+</b><span>stops mapped</span></div>
             </div>
@@ -208,15 +209,22 @@ gtag('config', '${GA_ID}');`}
                 </div>
               ))}
             </div>
+            <Image
+              src="/images/kbus-app-track-bus.png"
+              alt="kbus.me live bus tracking on a phone"
+              width={600}
+              height={600}
+              style={{ display: 'block', margin: '2rem auto 0', maxWidth: '100%', height: 'auto' }}
+            />
           </section>
 
           {/* Coverage */}
           <section className={`${styles.block} ${styles.wrap}`} id="coverage">
-            <h2>Covering every district KSRTC serves</h2>
-            <p className={styles.lede}>Pick a district to see its live routes and depots.</p>
+            <h2>Covering every city KSRTC serves</h2>
+            <p className={styles.lede}>Pick a city to see its live routes and depots.</p>
             <div className={styles.coverageGrid}>
-              {DISTRICTS.map((d) => (
-                <Link key={d.slug} href={`/map?district=${d.slug}`} onClick={() => saveDistrict(d.slug)}>
+              {CITIES.map((d) => (
+                <Link key={d.slug} href={`/map?city=${d.slug}`} onClick={() => saveCity(d.slug)}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                     <circle cx="12" cy="10" r="3" />

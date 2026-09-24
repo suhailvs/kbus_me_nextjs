@@ -1,21 +1,21 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import SiteLayout from '../components/SiteLayout';
-import { DISTRICTS, saveDistrict } from '../lib/districts';
+import { CITIES, saveCity } from '../lib/cities';
 import styles from '../styles/Landing.module.css';
 
-// One static page per district: /wayanad, /kozhikode, ...
+// One static page per city: /wayanad, /kozhikode, ...
 export function getStaticPaths() {
   return {
-    paths: DISTRICTS.map((d) => ({ params: { district: d.slug.toLowerCase() } })),
+    paths: CITIES.map((d) => ({ params: { city: d.slug.toLowerCase() } })),
     fallback: false, // anything else at the site root is a 404
   };
 }
 
 export function getStaticProps({ params }) {
-  const district = DISTRICTS.find((d) => d.slug.toLowerCase() === params.district);
-  if (!district) return { notFound: true };
-  return { props: { district } };
+  const city = CITIES.find((d) => d.slug.toLowerCase() === params.city);
+  if (!city) return { notFound: true };
+  return { props: { city } };
 }
 
 const svgProps = {
@@ -27,11 +27,11 @@ const svgProps = {
   strokeWidth: 2,
 };
 
-export default function DistrictPage({ district }) {
-  const { slug, label, stand } = district;
+export default function CityPage({ city }) {
+  const { slug, label, stand } = city;
   const url = `https://kbus.me/${slug.toLowerCase()}`;
-  const others = DISTRICTS.filter((d) => d.slug !== slug);
-  const openMap = () => saveDistrict(slug);
+  const others = CITIES.filter((d) => d.slug !== slug);
+  const openMap = () => saveCity(slug);
 
   const steps = [
     { title: `Open the ${label} map`, text: `The map opens centred on ${stand}.` },
@@ -71,7 +71,7 @@ export default function DistrictPage({ district }) {
     {
       accent: '#163F3D',
       title: 'Start where you are',
-      text: 'Jump to your current location, or switch to any other district from the dropdown on the map.',
+      text: 'Jump to your current location, or switch to any other city from the dropdown on the map.',
       icon: (
         <svg {...svgProps}>
           <circle cx="12" cy="12" r="3" />
@@ -100,7 +100,7 @@ export default function DistrictPage({ district }) {
         <title>{`Live Bus Tracking in ${label} | KSRTC ${label} Buses – kbus.me`}</title>
         <meta
           name="description"
-          content={`Track KSRTC buses live in ${label}. See buses near ${stand} and across the district on a real-time map.`}
+          content={`Track KSRTC buses live in ${label}. See buses near ${stand} and across the city on a real-time map.`}
         />
         <link rel="canonical" href={url} />
         <meta property="og:title" content={`Live KSRTC Bus Tracking in ${label}`} />
@@ -115,11 +115,11 @@ export default function DistrictPage({ district }) {
           <div>
             <h1>Live KSRTC bus tracking in {label}.</h1>
             <p>
-              See KSRTC buses around {stand} and across {label} district on a live map. Move the map
+              See KSRTC buses around {stand} and across {label} city on a live map. Move the map
               to your stop and watch the buses come to you.
             </p>
             <div className={styles.heroCtas}>
-              <Link className={styles.btnPrimary} href={`/map?district=${slug}`} onClick={openMap}>
+              <Link className={styles.btnPrimary} href={`/map?city=${slug}`} onClick={openMap}>
                 Open {label} live map
               </Link>
               <a className={styles.btnSecondary} href="#how-it-works">See how it works</a>
@@ -178,10 +178,10 @@ export default function DistrictPage({ district }) {
         </div>
       </section>
 
-      {/* Other districts */}
+      {/* Other cities */}
       <section className={`${styles.block} ${styles.wrap}`} id="coverage">
-        <h2>Other districts</h2>
-        <p className={styles.lede}>KSRTC live tracking across all 14 districts of Kerala.</p>
+        <h2>Other cities</h2>
+        <p className={styles.lede}>KSRTC live tracking across all 14 cities of Kerala.</p>
         <div className={styles.coverageGrid}>
           {others.map((d) => (
             <Link key={d.slug} href={`/${d.slug.toLowerCase()}`}>
@@ -202,7 +202,7 @@ export default function DistrictPage({ district }) {
             <h2>Your {label} bus is already on the map.</h2>
             <p>Open the map and see what&apos;s moving near you.</p>
           </div>
-          <Link className={styles.btnPrimary} href={`/map?district=${slug}`} onClick={openMap}>
+          <Link className={styles.btnPrimary} href={`/map?city=${slug}`} onClick={openMap}>
             Open live map
           </Link>
         </div>

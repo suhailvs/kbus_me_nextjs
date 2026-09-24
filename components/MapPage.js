@@ -3,53 +3,20 @@ import axios from 'axios';
 import { GoogleMap, useJsApiLoader, OverlayView } from '@react-google-maps/api';
 import { Sheet } from 'react-modal-sheet';
 import RouteDetail from './RouteDetail';
+import { CITIES } from '../lib/cities';
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyBwFTs8_ByftQEytonOPdVpdV9N0uyi3h4"; // process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-// Coordinates of each district's main KSRTC bus stand, keyed by the same
-// slug used in the coverage-grid links (?district=<slug>).
-const DISTRICT_CENTERS = {
-  thiruvananthapuram: { lat: 8.488, lng: 76.952 },
-  kollam: { lat: 8.891194, lng: 76.585128 },
-  Pathanamthitta: { lat: 9.2646, lng: 76.7871 },
-  kottayam: { lat: 9.594, lng: 76.5222 },
-  alappuzha: { lat: 9.4909, lng: 76.3257 },
-  idukki: { lat: 9.8952, lng: 76.7202 },
-  ernakulam: { lat: 9.9679, lng: 76.2854 },
-  thrissur: { lat: 10.51753, lng: 76.210431 },
-  palakkad: { lat: 10.7678, lng: 76.6491 },
-  malappuram: { lat: 11.051, lng: 76.0711 },
-  kozhikode: { lat: 11.2565, lng: 75.79 },
-  wayanad: { lat: 11.6085, lng: 76.0837 },
-  kannur: { lat: 11.867419, lng: 75.370598 },
-  kasaragod: { lat: 12.4913, lng: 74.9877 },
-};
-
-const DISTRICTS = [
-  { slug: 'thiruvananthapuram', label: 'Thiruvananthapuram' },
-  { slug: 'kollam', label: 'Kollam' },
-  { slug: 'Pathanamthitta', label: 'Pathanamthitta' },
-  { slug: 'kottayam', label: 'Kottayam' },
-  { slug: 'alappuzha', label: 'Alappuzha' },
-  { slug: 'idukki', label: 'Idukki' },
-  { slug: 'ernakulam', label: 'Ernakulam' },
-  { slug: 'thrissur', label: 'Thrissur' },
-  { slug: 'palakkad', label: 'Palakkad' },
-  { slug: 'malappuram', label: 'Malappuram' },
-  { slug: 'kozhikode', label: 'Kozhikode' },
-  { slug: 'wayanad', label: 'Wayanad' },
-  { slug: 'kannur', label: 'Kannur' },
-  { slug: 'kasaragod', label: 'Kasaragod' },
-];
+const CITY_CENTERS = Object.fromEntries(CITIES.map(({ slug, center }) => [slug, center]));
 
 // Only call this inside effects/handlers (browser only). Reading localStorage
 // during render would differ between server and client and break hydration.
-function readSelectedDistrictSlug() {
+function readSelectedCitySlug() {
   try {
-    const raw = localStorage.getItem('selectedDistrict');
+    const raw = localStorage.getItem('selectedCity');
     if (!raw) return '';
     const { slug } = JSON.parse(raw);
-    return DISTRICT_CENTERS[slug] ? slug : '';
+    return CITY_CENTERS[slug] ? slug : '';
   } catch {
     return ''; // missing/corrupted entry — fall back to the picker
   }
@@ -89,9 +56,9 @@ export default function MapPage() {
   const [isLocating, setIsLocating] = useState(false);
   const [locateError, setLocateError] = useState(null);
   // null  = haven't read localStorage yet (first render, matches the server)
-  // ''    = read it, nothing saved -> show the district picker
-  // slug  = a saved/selected district
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  // ''    = read it, nothing saved -> show the city picker
+  // slug  = a saved/selected city
+  const [selectedCity, setSelectedCity] = useState(null);
   const [isMapReady, setIsMapReady] = useState(false);
   const [sheetRoute, setSheetRoute] = useState(null); // { routeId, vehicleId } | null
 
@@ -101,11 +68,11 @@ export default function MapPage() {
     libraries: MAP_LIBRARIES,
   });
 
-  // Restore the saved district after mount.
+  // Restore the saved city after mount.
   useEffect(() => {
-    const slug = readSelectedDistrictSlug();
-    if (slug) initialCenterRef.current = DISTRICT_CENTERS[slug];
-    setSelectedDistrict(slug);
+    const slug = readSelectedCitySlug();
+    if (slug) initialCenterRef.current = CITY_CENTERS[slug];
+    setSelectedCity(slug);
   }, []);
 
   const handleBusSelect = useCallback((routeId, vehicleId) => {
@@ -194,32 +161,54 @@ export default function MapPage() {
     }
     setIsLocating(true);
     setLocateError(null);
+    const onSuccess = (pos) => {
+      const next = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (mapRef.current) mapRef.current.panTo(next);
+      if (circleRef.current) circleRef.current.setCenter(next);
+      setIsLocating(false);
+      refreshBuses();
+    };
+
+    const onFinalError = (err) => {
+      console.error('Geolocation error:', err.code, err.message);
+      const messages = {
+        1: 'Location permission denied. Allow it in your browser/site settings.',
+        2: "Your location isn't available right now.",
+        3: 'Getting your location timed out. Try again.',
+      };
+      setLocateError(messages[err.code] ?? "Couldn't get your location.");
+      setIsLocating(false);
+    };
+
+    // Fast attempt: network/cached location.
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const next = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        if (mapRef.current) mapRef.current.panTo(next);
-        if (circleRef.current) circleRef.current.setCenter(next);
-        setIsLocating(false);
-        refreshBuses();
+      onSuccess,
+      (err) => {
+        // Retrying can't fix a denied permission, so fail immediately.
+        if (err.code === err.PERMISSION_DENIED) {
+          onFinalError(err);
+          return;
+        }
+        // Slow fallback: GPS, longer timeout.
+        navigator.geolocation.getCurrentPosition(onSuccess, onFinalError, {
+          enableHighAccuracy: true,
+          timeout: 30000,
+        });
       },
-      () => {
-        setLocateError("Couldn't get your location. Check location permissions.");
-        setIsLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
     );
   }, [refreshBuses]);
 
-  const handleDistrictChange = useCallback(
+  const handleCityChange = useCallback(
     (e) => {
       const slug = e.target.value;
-      const center = DISTRICT_CENTERS[slug];
+      const center = CITY_CENTERS[slug];
       if (!center) return;
 
       initialCenterRef.current = center;
-      setSelectedDistrict(slug);
+      setSelectedCity(slug);
       try {
-        localStorage.setItem('selectedDistrict', JSON.stringify({ slug }));
+        localStorage.setItem('selectedCity', JSON.stringify({ slug }));
       } catch {
         // localStorage unavailable — selection still works for this session
       }
@@ -232,32 +221,32 @@ export default function MapPage() {
   );
 
   // Still reading localStorage — render the same empty shell as the server.
-  if (selectedDistrict === null) {
+  if (selectedCity === null) {
     return <div id="map-wrapper" />;
   }
 
-  if (!selectedDistrict) {
+  if (!selectedCity) {
     return (
-      <main className="district-picker" aria-labelledby="district-picker-title">
-        <div className="district-picker__card">
-          <h1 id="district-picker-title">Choose your district</h1>
-          <p>Select a district to view nearby buses.</p>
-          <label className="visually-hidden" htmlFor="district-picker-select">
-            District
+      <main className="city-picker" aria-labelledby="city-picker-title">
+        <div className="city-picker__card">
+          <h1 id="city-picker-title">Choose your city</h1>
+          <p>Select a city to view nearby buses.</p>
+          <label className="visually-hidden" htmlFor="city-picker-select">
+            City
           </label>
           <select
-            id="district-picker-select"
+            id="city-picker-select"
             className="form-select form-select-lg"
             value=""
-            onChange={handleDistrictChange}
+            onChange={handleCityChange}
             autoFocus
           >
             <option value="" disabled>
-              Select a district
+              Select a city
             </option>
-            {DISTRICTS.map((district) => (
-              <option key={district.slug} value={district.slug}>
-                {district.label}
+            {CITIES.map((city) => (
+              <option key={city.slug} value={city.slug}>
+                {city.label}
               </option>
             ))}
           </select>
@@ -300,15 +289,15 @@ export default function MapPage() {
       </GoogleMap>
 
       <select
-        id="district-select"
+        id="city-select"
         className="form-select form-select-sm shadow w-auto"
-        value={selectedDistrict}
-        onChange={handleDistrictChange}
+        value={selectedCity}
+        onChange={handleCityChange}
       >
         <option value="" disabled>
-          Select a district
+          Select a city
         </option>
-        {DISTRICTS.map((d) => (
+        {CITIES.map((d) => (
           <option key={d.slug} value={d.slug}>
             {d.label}
           </option>

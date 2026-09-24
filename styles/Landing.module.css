@@ -143,5 +143,5 @@
   .siteHeader nav { display: none; }
 }
 
-/* District page: stand name on the hero card */
+/* City page: stand name on the hero card */
 .standName { font-family: var(--font-display), sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--teal); margin: -10px 0 8px; }
