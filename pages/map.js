@@ -2,7 +2,7 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 
 // The map, Google Maps loader and bottom sheet are browser-only, so skip SSR.
-const MapPage = dynamic(() => import('../components/MapPage'), {
+const MapPage = dynamic(() => import('../components/MapPageLeaflet'), {
   ssr: false,
   loading: () => <div id="map-wrapper" />,
 });
