@@ -101,7 +101,7 @@ const JSON_LD = {
 const REDIRECT_SCRIPT = `(function () {
   try {
     if (localStorage.getItem('selectedCity')) {
-      window.location.replace('/map');
+      window.location.replace('https://play.google.com/store/apps/details?id=app.zophop&hl=en');
     }
   } catch (e) {}
 })();`;
@@ -148,7 +148,7 @@ gtag('config', '${GA_ID}');`}
                   the map, and time your walk to the stop instead of guessing.
                 </p>
                 <div className={styles.heroCtas}>
-                  <Link className={styles.btnPrimary} href="/map">Open live map</Link>
+                  <Link className={styles.btnPrimary} href="https://play.google.com/store/apps/details?id=app.zophop&hl=en">Open live map</Link>
                   <a className={styles.btnSecondary} href="#how-it-works">See how it works</a>
                 </div>
               </div>
@@ -224,7 +224,7 @@ gtag('config', '${GA_ID}');`}
             <p className={styles.lede}>Pick a city to see its live routes and depots.</p>
             <div className={styles.coverageGrid}>
               {CITIES.map((d) => (
-                <Link key={d.slug} href={`/map?city=${d.slug}`} onClick={() => saveCity(d.slug)}>
+                <Link key={d.slug} href={`https://play.google.com/store/apps/details?id=app.zophop&hl=en`} onClick={() => saveCity(d.slug)}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                     <circle cx="12" cy="10" r="3" />
@@ -259,7 +259,7 @@ gtag('config', '${GA_ID}');`}
                 <h2>Your bus is already on the map.</h2>
                 <p>Search your route and see it moving in real time.</p>
               </div>
-              <Link className={styles.btnPrimary} href="/map">Open live map</Link>
+              <Link className={styles.btnPrimary} href="https://play.google.com/store/apps/details?id=app.zophop&hl=en">Open live map</Link>
             </div>
           </section>
       </SiteLayout>

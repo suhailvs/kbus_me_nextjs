@@ -24,7 +24,7 @@ export default function SiteLayout({ children }) {
         <nav>
           <Link className={styles.navLink} href="/#how-it-works">How it works</Link>
           <Link className={styles.navLink} href="/#coverage">Coverage</Link>
-          <Link className={styles.btnPrimary} href="/map">Open live map</Link>
+          <Link className={styles.btnPrimary} href="https://play.google.com/store/apps/details?id=app.zophop&hl=en">Open live map</Link>
         </nav>
       </header>
 
@@ -37,7 +37,7 @@ export default function SiteLayout({ children }) {
             officially affiliated with, or endorsed by, Kerala State Road Transport Corporation.
           </p>
           <div className={styles.footerLinks}>
-            <Link href="/map">Live map</Link>
+            <Link href="https://play.google.com/store/apps/details?id=app.zophop&hl=en">Live map</Link>
           </div>
         </div>
       </footer>

@@ -129,7 +129,7 @@ gtag('config', '${GA_ID}');`}
               to your stop and watch the buses come to you.
             </p>
             <div className={styles.heroCtas}>
-              <Link className={styles.btnPrimary} href={`/map?city=${slug}`} onClick={openMap}>
+              <Link className={styles.btnPrimary} href={`https://play.google.com/store/apps/details?id=app.zophop&hl=en`} onClick={openMap}>
                 Open {label} live map
               </Link>
               <a className={styles.btnSecondary} href="#how-it-works">See how it works</a>
@@ -212,7 +212,7 @@ gtag('config', '${GA_ID}');`}
             <h2>Your {label} bus is already on the map.</h2>
             <p>Open the map and see what&apos;s moving near you.</p>
           </div>
-          <Link className={styles.btnPrimary} href={`/map?city=${slug}`} onClick={openMap}>
+          <Link className={styles.btnPrimary} href={`https://play.google.com/store/apps/details?id=app.zophop&hl=en`} onClick={openMap}>
             Open live map
           </Link>
         </div>
