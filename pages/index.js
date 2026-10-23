@@ -100,9 +100,7 @@ const JSON_LD = {
 // /map without ever seeing this page.
 const REDIRECT_SCRIPT = `(function () {
   try {
-    if (localStorage.getItem('selectedCity')) {
-      window.location.replace('https://play.google.com/store/apps/details?id=app.zophop&hl=en');
-    }
+    
   } catch (e) {}
 })();`;
 
